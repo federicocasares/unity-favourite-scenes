@@ -81,7 +81,7 @@ public class SceneQuickAccessWindow : EditorWindow {
         newScenePath = EditorGUILayout.TextField("Scene Path:", newScenePath);
         if (GUILayout.Button("Add", GUILayout.Width(45))) {
             if (!string.IsNullOrEmpty(newScenePath) && !scenePaths.Contains(newScenePath)) {
-                scenePaths.Add(newScenePath);
+                scenePaths.Add(VerifyAndNormalizeScenePath(newScenePath));
                 SaveScenePaths();
                 newScenePath = "";
             }
@@ -130,12 +130,12 @@ public class SceneQuickAccessWindow : EditorWindow {
 
     private void SaveScenePaths() {
         // Remove any invalid scenes and duplicates before saving
-        scenePaths = scenePaths.Where(path => VerifyAndNormalizeScenePath(path)).Distinct().ToList();
+        scenePaths = scenePaths.Where(path => VerifyAndNormalizeScenePath(path) != "").Distinct().ToList();
         EditorPrefs.SetString("SceneQuickAccess_Paths", string.Join(";", scenePaths));
         UpdateSceneColors();
     }
 
-    private bool VerifyAndNormalizeScenePath(string path) {
+    private string VerifyAndNormalizeScenePath(string path) {
         string normalizedPath = path;
 
         // Add Assets/ prefix if missing
@@ -151,9 +151,9 @@ public class SceneQuickAccessWindow : EditorWindow {
         // Check if the scene exists
         if (!File.Exists(normalizedPath)) {
             Debug.LogWarning($"Scene not found: {normalizedPath}");
-            return false;
+            return "";
         }
-        return true;
+        return normalizedPath;
     }
 
     private string GetHelpText() {
