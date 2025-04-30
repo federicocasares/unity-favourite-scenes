@@ -136,6 +136,10 @@ public class SceneQuickAccessWindow : EditorWindow {
     }
 
     private string VerifyAndNormalizeScenePath(string path) {
+        if (string.IsNullOrEmpty(path)) {
+            return "";
+        }
+
         string normalizedPath = path;
 
         // Add Assets/ prefix if missing
