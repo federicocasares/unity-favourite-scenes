@@ -19,7 +19,7 @@ public class SceneQuickAccessWindow : EditorWindow {
 
     private void OnEnable() {
         // Load saved scene paths from the editor preferences
-        string savedPaths = EditorPrefs.GetString("SceneQuickAccess_Paths", "");
+        string savedPaths = EditorPrefs.GetString(GetEditorPrefsKey(), "");
         if (!string.IsNullOrEmpty(savedPaths)) {
             // Hopefully separating by ; is good enough and won't break!
             scenePaths = new List<string>(savedPaths.Split(';'));
@@ -131,7 +131,7 @@ public class SceneQuickAccessWindow : EditorWindow {
     private void SaveScenePaths() {
         // Remove any invalid scenes and duplicates before saving
         scenePaths = scenePaths.Where(path => VerifyAndNormalizeScenePath(path) != "").Distinct().ToList();
-        EditorPrefs.SetString("SceneQuickAccess_Paths", string.Join(";", scenePaths));
+        EditorPrefs.SetString(GetEditorPrefsKey(), string.Join(";", scenePaths));
         UpdateSceneColors();
     }
 
@@ -158,6 +158,10 @@ public class SceneQuickAccessWindow : EditorWindow {
             return "";
         }
         return normalizedPath;
+    }
+
+    private string GetEditorPrefsKey() {
+        return "SceneQuickAccess_Paths_" + PlayerSettings.productGUID.ToString();
     }
 
     private string GetHelpText() {
